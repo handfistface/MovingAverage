@@ -1,0 +1,8 @@
+D:\App_Dev\MovingAverage\MovingAverage\bin\Release\MovingAverage.exe.config
+D:\App_Dev\MovingAverage\MovingAverage\bin\Release\MovingAverage.exe
+D:\App_Dev\MovingAverage\MovingAverage\bin\Release\MovingAverage.pdb
+D:\App_Dev\MovingAverage\MovingAverage\obj\Release\MovingAverage.MovingAverage.resources
+D:\App_Dev\MovingAverage\MovingAverage\obj\Release\MovingAverage.Properties.Resources.resources
+D:\App_Dev\MovingAverage\MovingAverage\obj\Release\MovingAverage.csproj.GenerateResource.Cache
+D:\App_Dev\MovingAverage\MovingAverage\obj\Release\MovingAverage.exe
+D:\App_Dev\MovingAverage\MovingAverage\obj\Release\MovingAverage.pdb

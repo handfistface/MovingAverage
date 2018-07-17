@@ -1,1 +1,10 @@
 D:\App_Dev\MovingAverage\MovingAverage\bin\Debug\MovingAverage.exe.config
+D:\App_Dev\MovingAverage\MovingAverage\obj\Debug\MovingAverage.csprojResolveAssemblyReference.cache
+D:\App_Dev\MovingAverage\MovingAverage\obj\Debug\MovingAverage.MovingAverage.resources
+D:\App_Dev\MovingAverage\MovingAverage\obj\Debug\MovingAverage.Properties.Resources.resources
+D:\App_Dev\MovingAverage\MovingAverage\obj\Debug\MovingAverage.csproj.GenerateResource.Cache
+D:\App_Dev\MovingAverage\MovingAverage\bin\Debug\MovingAverage.exe
+D:\App_Dev\MovingAverage\MovingAverage\bin\Debug\MovingAverage.pdb
+D:\App_Dev\MovingAverage\MovingAverage\obj\Debug\MovingAverage.exe
+D:\App_Dev\MovingAverage\MovingAverage\obj\Debug\MovingAverage.pdb
+D:\App_Dev\MovingAverage\MovingAverage\bin\Debug\Windows Ding.wav
