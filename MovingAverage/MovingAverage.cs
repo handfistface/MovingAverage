@@ -46,9 +46,12 @@ namespace MovingAverage
 #if (DEBUG)
             //then the app is currently in the DEBUG mode 
             rtxt_MovAvg.Visible = true;       //set the window to visible
-            txt_WindowSize.Text = "3";      //set the text box text for the window size
-            txt_DblArr.Text = "0 1 2 3";        //set the text box for the dbl array
-            rtxtWriteLine("Output should be: [0, 0.5, 1, 2]");
+            //txt_WindowSize.Text = "3";      //set the text box text for the window size
+            //txt_DblArr.Text = "0 1 2 3";        //set the text box for the dbl array
+            //rtxtWriteLine("Output should be: [0, 0.5, 1, 2]");
+            txt_WindowSize.Text = "5";      //set the text box for the window size
+            txt_DblArr.Text = "0 1 -2 3 -4 5 -6 7 8 9";     //set the dbl array text box
+            rtxtWriteLine("Output should be: [0, 0.5, -0.33, 0.5, -0.4, 0.6, -0.8, 1, -1.2, 1.4");
 #else
             //otherwise the app is current in release mode
             rtxt_MovAvg.Visible = false;        //set the window to invis so the user can't see diag info
@@ -68,7 +71,7 @@ namespace MovingAverage
         /// <returns>A double array holding the parsed input, null if there is an error encountered</returns>
         private double[] ParseArrInput(string s_ToParse)
         {
-            char[] ca_Delims = { ' ', '-', ':', '/', '*', ';', '\\' };      //bunch of deliminators to remove from the split string
+            char[] ca_Delims = { ' ', ':', '/', '*', ';', '\\' };      //bunch of deliminators to remove from the split string
             string[] sa_Split = s_ToParse.Split(ca_Delims);     //split the argument to this method
             double[] da_Ret = new double[sa_Split.Length];      //create the double array return based on the split string
             //loop through each string that was used
@@ -93,25 +96,32 @@ namespace MovingAverage
         /// private void btn_Calculate_Click(object sender, EventArgs e)
         /// Gets called whenever the user clicks on the 'Calculate' button
         /// First the input is parsed into the respective arrays
-        /// If there is an error then the function pre-maturely returns
+        /// If there is an error then the method pre-maturely returns
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btn_Calculate_Click(object sender, EventArgs e)
         {
-            int i_WinSz;        //holds the window size to pass to the function
+            int i_WinSz;        //holds the window size to pass to the method
             if (!int.TryParse(txt_WindowSize.Text, out i_WinSz))
             {
                 //then the conversion did not succeed, notify the user, will show a message box depending on the mode of debugging
                 rtxtWriteLine("Error parsing input for the window size. Please enter a valid number", rtxt_MovAvg, true);
-                return;     //return from the function
+                return;     //return from the method
+            }
+            //prevent any input that is less than 0
+            if (i_WinSz < 0)
+            {
+                //then the averages cannot be calculated, notify the user
+                rtxtWriteLine("Error with input integer, cannot use a negative number.");
+                return;     //return from the method
             }
             double[] da_DblArr = ParseArrInput(txt_DblArr.Text);        //parse the double array into an array
             if (da_DblArr == null)
             {
                 //then the conversion to the double array did not succeed, notify the user, will show a message box depending on the mode of debugging
                 rtxtWriteLine("Error parsing input for the double array. Please enter a valid array of doubles", rtxt_MovAvg, true);
-                return;     //return from the function
+                return;     //return from the method
             }
             //conditionally display info based on what mode of debugging is occuring
 #if (DEBUG)
@@ -123,6 +133,12 @@ namespace MovingAverage
             rtxtWriteLine(s_Print);
 #endif
             //now that the information required for the calculation has been obtained, it is safe to start calculating the running averages
+            double[] da_Calcuated = Compute(i_WinSz, da_DblArr);
+            //then display the string output to the user
+            string s_Disp = "Calculated output: ";
+            foreach (double d in da_Calcuated)
+                s_Disp += d + " ";
+            rtxtWriteLine(s_Disp, rtxt_MovAvg, true);
         }
         #endregion private void btn_Calculate_Click(object sender, EventArgs e)
 
@@ -241,7 +257,8 @@ namespace MovingAverage
             {
                 if (c >= '0' && c <= '9' || 
                     c == ' ' || 
-                    c == '.')
+                    c == '.' ||
+                    c == '-')
                 {
                     //then this is a valid character, tack it onto the end of the output string
                     s_Ret += c;     //tack the character onto the end
@@ -301,7 +318,7 @@ namespace MovingAverage
         /// <summary>
         /// private void rtxtWriteLine(string s_Print)
         /// Prints a line of text to the class' rich text box (rtxt_MovAvg)
-        /// A message box will not be shown to the user, to do that, call the more in depth rtxtWriteLine method
+        /// A message box will not be shown to the user in the release branch, to do that, call the more in depth rtxtWriteLine method
         /// </summary>
         /// <param name="s_Print">The line of text to print</param>
         private void rtxtWriteLine(string s_Print)
@@ -310,5 +327,58 @@ namespace MovingAverage
             rtxtWriteLine(s_Print, rtxt_MovAvg, false);
         }
         #endregion private void rtxtWriteLine(string s_Print)
+
+        //
+        // The main objective of this program is the following function Compute()
+        // The simple moving average needs finished, might be the scientific term
+        // https://en.wikipedia.org/wiki/Moving_average
+        //
+        #region private double[] Compute(int i_WinSz, double[] da_DblArr)
+        /// <summary>
+        /// private double[] Compute(int i_WinSz, double[] da_DblArr)
+        /// This function will handle calculating the moving average
+        /// </summary>
+        /// <param name="i_WinSz">The integer size which will be used for the average calculations, error handling must be done to prevent this number from being lower than 0</param>
+        /// <param name="da_DblArr">The array of doubles which will be used to calculate the output</param>
+        /// <returns>A double array of the average corresponding to the output requested, a mix of Cumulative Moving Averages and Simple Moving Averages</returns>
+        private double[] Compute(int i_WinSz, double[] da_DblArr)
+        {
+            double[] da_Ret = new double[da_DblArr.Length];        //create a new double array based on the passed parameter
+            double d_Avg = 0;       //average of the array
+            double d_RunningTotal = 0;      //a running total sum of the values in the array being processed
+            //loop through each of the entries, each entry for the average must be calculated
+            for(int i=0; i < da_DblArr.Length; i++)
+            {
+                //has the limiter been reached?
+                if (i - i_WinSz < 0)
+                {
+                    //then the cumulative moving average should be calculated
+                    d_RunningTotal += da_DblArr[i];
+                    //verify that the current index is not 0 at the moment
+                    if (i == 0)
+                    {
+                        //then this is the first index, set the average to the first item
+                        d_Avg = da_DblArr[i];
+                    }
+                    else
+                    {
+                        //otherwise the average was not zero before hand and the previous calculation can be used
+                        d_Avg = d_RunningTotal / (i + 1);
+                    }
+                }
+                else
+                {
+                    //otherwise index is greater than the window size, the simple moving average should be calculated
+                    //make sure that the window subtraction does not cause an issue with over stepping the array
+                    //otherwise there's no problems overstepping the array
+                    //remove the previous reading from the average
+                    d_RunningTotal += da_DblArr[i];     //adjust the running total
+                    d_Avg = (d_RunningTotal - da_DblArr[i - i_WinSz]) / i;
+                }
+                da_Ret[i] = d_Avg;      //set the return string
+            }
+            return da_Ret;      //return the array for the user
+        }
+        #endregion private double[] Compute(int i_WinSz, double[] da_DblArr)
     }
 }
