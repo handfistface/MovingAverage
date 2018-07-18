@@ -12,7 +12,10 @@ using System.Windows.Forms;
 namespace MovingAverage
 {
     /// <summary>
-    /// MovingAverage
+    /// Author: John Kirschner
+    /// Date: 07-16-2018
+    /// Class: MovingAverage
+    /// Description: 
     /// This class calculates the moving average from an interface. This is based off the documentation provided by MModal in the documentation folder
     /// There are two parameters to the function that is used to calculate the moving average
     /// The simple moving average and the cumulative moving average are both calculated
@@ -24,6 +27,7 @@ namespace MovingAverage
     ///     - Only standard ASCII is recognized as input
     ///     - Length of the bool array input is technically infinite
     ///     - Main rich text box does not limit the length of its text, only applicable in the debug branch
+    ///     - If bad arguments are given to the Compute() method then the method will throw exceptions
     /// </summary>
     public partial class MovingAverage : Form
     {
@@ -46,11 +50,8 @@ namespace MovingAverage
 #if (DEBUG)
             //then the app is currently in the DEBUG mode 
             rtxt_MovAvg.Visible = true;       //set the window to visible
-            //txt_WindowSize.Text = "3";      //set the text box text for the window size
-            //txt_DblArr.Text = "0 1 2 3";        //set the text box for the dbl array
-            //rtxtWriteLine("Output should be: [0, 0.5, 1, 2]");
             txt_WindowSize.Text = "5";      //set the text box for the window size
-            txt_DblArr.Text = "0 1 -2 3 -4 5 -6 7 8 9";     //set the dbl array text box
+            txt_DblArr.Text = "0 1 -2 3 -4 5 -6 7 -8 9";     //set the dbl array text box
             rtxtWriteLine("Output should be: [0, 0.5, -0.33, 0.5, -0.4, 0.6, -0.8, 1, -1.2, 1.4");
 #else
             //otherwise the app is current in release mode
@@ -330,19 +331,33 @@ namespace MovingAverage
 
         //
         // The main objective of this program is the following function Compute()
-        // The simple moving average needs finished, might be the scientific term
+        // I used a combination of wikipedia and youtube to determine the algorithms I used to calculate the moving averages
         // https://en.wikipedia.org/wiki/Moving_average
+        // https://www.youtube.com/watch?v=x4nO5yoarM0
         //
         #region private double[] Compute(int i_WinSz, double[] da_DblArr)
         /// <summary>
         /// private double[] Compute(int i_WinSz, double[] da_DblArr)
         /// This function will handle calculating the moving average
+        /// Before the index of i_WinSz has been reached the Cumulative Moving Average is calculated and stored in the array index
+        /// When the index of i_WinSz is reached in the da_DblArr then the Simple Moving Average is used to calculate the 
+        /// output at the index that is being examined
         /// </summary>
         /// <param name="i_WinSz">The integer size which will be used for the average calculations, error handling must be done to prevent this number from being lower than 0</param>
-        /// <param name="da_DblArr">The array of doubles which will be used to calculate the output</param>
-        /// <returns>A double array of the average corresponding to the output requested, a mix of Cumulative Moving Averages and Simple Moving Averages</returns>
+        /// <param name="da_DblArr">The array of doubles which will be used to calculate the average output</param>
+        /// <returns>A double array of the average corresponding to the output requested, 
+        ///     a mix of Cumulative Moving Averages and Simple Moving Averages based on position of calculation and i_WinSz. 
+        ///     Will throw an exception if something bad happens</returns>
+        /// <exception cref="ArgumentException">Errors can be encountered when i_WinSz are passed to this method. The 
+        ///     argument must be greater than 0 to prevent any issues with overstepping the da_DblArr variable</exception>
+        /// <exception cref="NullReferenceException">Errors an be encountered when da_DblArr are null. Throws an exception for this
+        ///     specific case. </exception> 
         private double[] Compute(int i_WinSz, double[] da_DblArr)
         {
+            if (i_WinSz <= 0)
+                throw new ArgumentException("Error with i_WinSz argument. Value is less than or equal to zero.");
+            if (da_DblArr == null)
+                throw new NullReferenceException("Error with da_DblArr argument. Value that was passed is null.");
             double[] da_Ret = new double[da_DblArr.Length];        //create a new double array based on the passed parameter
             double d_Avg = 0;       //average of the array
             double d_RunningTotal = 0;      //a running total sum of the values in the array being processed
@@ -369,11 +384,12 @@ namespace MovingAverage
                 else
                 {
                     //otherwise index is greater than the window size, the simple moving average should be calculated
-                    //make sure that the window subtraction does not cause an issue with over stepping the array
-                    //otherwise there's no problems overstepping the array
+                    //there should be no issues with overstepping the array in this case
+                    //the SMA that is calculated here is the financial SMA, the average is based off of the previous values
                     //remove the previous reading from the average
                     d_RunningTotal += da_DblArr[i];     //adjust the running total
-                    d_Avg = (d_RunningTotal - da_DblArr[i - i_WinSz]) / i;
+                    d_RunningTotal -= da_DblArr[i - i_WinSz];       //remove the previous value from the running total
+                    d_Avg = (d_RunningTotal) / (i_WinSz);       //calculate the new simple moving average
                 }
                 da_Ret[i] = d_Avg;      //set the return string
             }

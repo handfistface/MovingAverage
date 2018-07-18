@@ -6,3 +6,4 @@ D:\App_Dev\MovingAverage\MovingAverage\obj\Release\MovingAverage.Properties.Reso
 D:\App_Dev\MovingAverage\MovingAverage\obj\Release\MovingAverage.csproj.GenerateResource.Cache
 D:\App_Dev\MovingAverage\MovingAverage\obj\Release\MovingAverage.exe
 D:\App_Dev\MovingAverage\MovingAverage\obj\Release\MovingAverage.pdb
+D:\App_Dev\MovingAverage\MovingAverage\bin\Release\Windows Ding.wav
