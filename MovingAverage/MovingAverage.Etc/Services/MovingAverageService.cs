@@ -41,10 +41,6 @@ namespace MovingAverage.Etc.Services
         public void AddValue(double value)
         {
             ValuesToCalc.Add(value);
-
-            //pop stuff off if the length of the queue if it is too high
-            if (ValuesToCalc.Count > WindowSize)
-                ValuesToCalc.Add(value);
         }
         #endregion
         #region AddValues(IEnumerable<double> values)
@@ -69,20 +65,21 @@ namespace MovingAverage.Etc.Services
             double movingTotal = 0;     //running total count
             int loopCount = 1;      //how many times the loop has been iterated
             List<double> averages = new List<double>();
-            double firstAddedItem = ValuesToCalc.FirstOrDefault();
+            Queue<double> processedNumbers = new Queue<double>();       //holds all of the processed doubles
 
             //go through each record and calculate the totals
             foreach(double dbl in ValuesToCalc)
             {
                 movingTotal += dbl;
                 double avg = movingTotal / loopCount;
+                processedNumbers.Enqueue(dbl);
                 averages.Add(avg);
 
                 //adjust the loop count and moving total
                 if (loopCount < WindowSize)
                     loopCount++;
                 else
-                    movingTotal -= ValuesToCalc.ElementAt(loopCount - WindowSize);
+                    movingTotal -= processedNumbers.Dequeue();
             }
 
             return averages;

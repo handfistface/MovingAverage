@@ -36,5 +36,27 @@ namespace MovingAverage.Tests.Services
             asserter.AreEqual(expected, actual);
         }
         #endregion
+
+        #region Compute_5()
+        [TestMethod]
+        public void Compute_5()
+        {
+            //'fixture' data
+            double[] toCalc = new double[] { 0, 1, -2, 3, -4, 5, -6, 7, -8, 9 };
+            double[] expected = new double[] { 0, 0.5, -0.3333333333333333, 0.5, -0.4, 0.6, -0.8, 1, -1.2, 1.4 };
+
+            //setup the averager
+            MovingAverageService averager = new MovingAverageService();
+            averager.WindowSize = 5;
+            averager.AddValues(toCalc);
+
+            //calculate the averages
+            double[] actual = averager.CalculateAverage().ToArray();
+
+            //assert the values
+            DoubleArrayAsserter asserter = new DoubleArrayAsserter();
+            asserter.AreEqual(expected, actual);
+        }
+        #endregion
     }
 }
