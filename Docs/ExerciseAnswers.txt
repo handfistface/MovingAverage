@@ -1,0 +1,28 @@
+
+1. Instructions for compiling and running the program:
+	- Install the latest version of visual studio 2019, I used VS Community 2019 version 16.11.2
+	- Make sure that the libraries for .NET 5.0 are installed
+	- Open the sln file in VS
+	- Make sure that the MovingAverage.Terminal is the startup project
+	- Go ahead and click debug, or alternatively, compile & run the binaries manually
+	
+2. A description of your solution and any assumptions it makes
+	- I've separated out different functionality into different libraries 
+		+ The MovingAverage.Etc project has the main functionality of the exercise
+		+ The MovingAverage.Terminal project allows interacting in real time with the exercise
+		+ The MovingAverage.Tests has some unit testing
+	- The main point of interest will be the MovingAverage.Etc.Services namespace
+	- This project assumes you will be entering data through the terminal, any input sanitization is
+	  done through the Terminal project
+	- If you create unit tests and enter data through those, you will be able to enter invalid cases such
+	  as if you enter negative numbers for the window size
+	  
+3. Analysis of the time complexity of your solution, preferably in terms of big-O notation
+	- The MovingAverageService.Calculate() method should run in O(n) where n is the size of the array
+	
+4. Analysis of the space complexity of your solution, preferably in terms of big-O notation
+	- The MovingAverageService.Calculate() method should require O(n) memory to function where n 
+	  is the size of a double (8 bytes) multiplied by the size of the array we are calculating
+	- This does not include the overhead for running a Terminal (on my debug machine was approx. 8 MB)
+	- There is also a collection of the same size of the array instantiated and used while running
+	  so you could break this down further to O(2n), but that is not the normal case of representation
